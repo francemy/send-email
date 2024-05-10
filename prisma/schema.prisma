@@ -1,0 +1,104 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["mongodb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id           String  @id @default(auto()) @map("_id")  @db.ObjectId
+  nomeuser   String @db.String
+  email         String  @unique
+  palavrapasse  String  
+  autenticacao  String?  @unique 
+  Login         Login[]    // Relação opcional com Login
+  Destinatarios Destinatario[]
+  Email Email[]
+  userTemplate userTemplate[]
+  GroupDestinatario GroupDestinatario[]
+}
+
+model Login {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  id_user  String @db.ObjectId
+  token       String 
+  data_login DateTime
+  user     user   @relation(fields: [id_user], references: [id])
+}
+
+model GroupDestinatario {
+  id   String  @id @default(auto()) @map("_id") @db.ObjectId
+  nome String @unique 
+  id_user  String @db.ObjectId
+  user    user   @relation(fields: [id_user], references: [id])
+  DestinatariosParaGrupo DestinatariosParaGrupo[]
+}
+
+model Destinatario {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  id_user  String @db.ObjectId
+  nome        String 
+  email       String @unique
+  user     user   @relation(fields: [id_user], references: [id])
+  DestinatariosParaGrupo DestinatariosParaGrupo[]
+  Email Email[]
+}
+
+model DestinatariosParaGrupo {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  id_destinatario  String @db.ObjectId
+  id_groupo   String @db.ObjectId
+  Destinatario     Destinatario   @relation(fields: [id_destinatario], references: [id])
+  GroupDestinatario GroupDestinatario @relation(fields: [id_groupo], references: [id])
+
+  @@unique([id_destinatario, id_groupo])
+  
+}
+
+model Email {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  id_user       String @db.ObjectId
+  id_destinatario  String @db.ObjectId
+  assunto          String 
+  id_template      String @db.ObjectId
+  data             DateTime 
+  user          user    @relation(fields: [id_user], references: [id])
+  Destinatario     Destinatario @relation(fields: [id_destinatario], references: [id])
+  Template         Template   @relation(fields: [id_template], references: [id])
+  EstadoEmail EstadoEmail?
+}
+
+model EstadoEmail {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  id_email   String  @unique @db.ObjectId
+  estado     estado
+  Email      Email   @relation(fields: [id_email], references: [id])
+}
+
+enum estado {
+  enviado
+  agendado
+  falhado
+}
+
+model userTemplate {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  id_user  String @db.ObjectId
+  id_template String @db.ObjectId
+  user     user   @relation(fields: [id_user], references: [id])
+  Template    Template  @relation(fields: [id_template], references: [id])
+
+  @@unique([id_user, id_template])
+}
+
+model Template {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  caminhourl String 
+  titulo     String 
+  userTemplates userTemplate[]
+  Email Email[]
+}
