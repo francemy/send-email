@@ -1,17 +1,16 @@
 // schema.prisma
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["mongodb"]
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
 model user {
-  id           String  @id @default(auto()) @map("_id")  @db.ObjectId
-  nomeuser   String @db.String
+  id           Int  @id @default(autoincrement())
+  nomeuser   String 
   email         String  @unique
   palavrapasse  String  
   autenticacao  String?  @unique 
@@ -23,24 +22,24 @@ model user {
 }
 
 model Login {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  id_user  String @db.ObjectId
+  id       Int  @id @default(autoincrement())
+  id_user  Int
   token       String 
   data_login DateTime
   user     user   @relation(fields: [id_user], references: [id])
 }
 
 model GroupDestinatario {
-  id   String  @id @default(auto()) @map("_id") @db.ObjectId
+  id   Int  @id @default(autoincrement())
   nome String @unique 
-  id_user  String @db.ObjectId
+  id_user  Int
   user    user   @relation(fields: [id_user], references: [id])
   DestinatariosParaGrupo DestinatariosParaGrupo[]
 }
 
 model Destinatario {
-  id         String  @id @default(auto()) @map("_id") @db.ObjectId
-  id_user  String @db.ObjectId
+  id         Int  @id @default(autoincrement())
+  id_user  Int
   nome        String 
   email       String @unique
   user     user   @relation(fields: [id_user], references: [id])
@@ -49,9 +48,9 @@ model Destinatario {
 }
 
 model DestinatariosParaGrupo {
-  id         String  @id @default(auto()) @map("_id") @db.ObjectId
-  id_destinatario  String @db.ObjectId
-  id_groupo   String @db.ObjectId
+  id         Int  @id @default(autoincrement())
+  id_destinatario  Int
+  id_groupo   Int
   Destinatario     Destinatario   @relation(fields: [id_destinatario], references: [id])
   GroupDestinatario GroupDestinatario @relation(fields: [id_groupo], references: [id])
 
@@ -60,11 +59,11 @@ model DestinatariosParaGrupo {
 }
 
 model Email {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  id_user       String @db.ObjectId
-  id_destinatario  String @db.ObjectId
+  id     Int  @id @default(autoincrement())
+  id_user       Int
+  id_destinatario  Int
   assunto          String 
-  id_template      String @db.ObjectId
+  id_template      Int
   data             DateTime 
   user          user    @relation(fields: [id_user], references: [id])
   Destinatario     Destinatario @relation(fields: [id_destinatario], references: [id])
@@ -73,8 +72,8 @@ model Email {
 }
 
 model EstadoEmail {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  id_email   String  @unique @db.ObjectId
+  id        Int  @id @default(autoincrement())
+  id_email   Int  @unique
   estado     estado
   Email      Email   @relation(fields: [id_email], references: [id])
 }
@@ -86,9 +85,9 @@ enum estado {
 }
 
 model userTemplate {
-  id         String  @id @default(auto()) @map("_id") @db.ObjectId
-  id_user  String @db.ObjectId
-  id_template String @db.ObjectId
+  id         Int  @id @default(autoincrement())
+  id_user  Int
+  id_template Int
   user     user   @relation(fields: [id_user], references: [id])
   Template    Template  @relation(fields: [id_template], references: [id])
 
@@ -96,7 +95,7 @@ model userTemplate {
 }
 
 model Template {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id       Int  @id @default(autoincrement())
   caminhourl String 
   titulo     String 
   userTemplates userTemplate[]

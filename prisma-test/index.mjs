@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 export const prisma = new PrismaClient()
 let res;
 async function main() {
-   res = await prisma.user.findMany()
+   res = await prisma.login.findMany()
    
    
    
